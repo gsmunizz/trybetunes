@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
+import AlbumRender from '../components/AlbumRender';
 import Header from '../components/Header';
+import Loading from '../components/Loading';
+import searchAlbumsAPI from '../services/searchAlbumsAPI';
 
 class Search extends Component {
   constructor(props) {
@@ -7,6 +10,10 @@ class Search extends Component {
 
     this.state = {
       inputString: '',
+      artistName: '',
+      allAlbums: [],
+      isAlbumFound: false,
+      isLoading: false,
     };
   }
 
@@ -17,20 +24,45 @@ class Search extends Component {
     });
   }
 
-  isMoreThan = () => {
-    const { inputString } = this.state;
-    const minLength = 2;
-    return (
-      inputString.length < minLength
-    );
+  getAlbums = async () => {
+    const { artistName } = this.state;
+    await searchAlbumsAPI(artistName).then((element) => this.setState({
+      allAlbums: [...element],
+      isAlbumFound: true,
+      isLoading: false,
+    }));
   }
 
-  render() {
+  handleClickButton = () => {
     const { inputString } = this.state;
+    const artistName = inputString;
+    this.setState({
+      inputString: '',
+      artistName,
+      isLoading: true,
+    }, () => this.getAlbums());
+  }
+
+  handleRenderAlbum = (allAlbums) => allAlbums.map((album) => (
+    <AlbumRender key={ album.collectionId } album={ album } />
+  ))
+
+  render() {
+    const { inputString, isAlbumFound, isLoading, allAlbums, artistName } = this.state;
+    const albumCards = (
+      <section>
+        <h2>
+          {allAlbums.length
+            ? `Resultado de álbuns de: ${artistName}`
+            : isAlbumFound && 'Nenhum álbum foi encontrado'}
+        </h2>
+        {this.handleRenderAlbum(allAlbums)}
+      </section>
+    );
     return (
       <div data-testid="page-search">
         <Header />
-        <form>
+        <section>
           <input
             data-testid="search-artist-input"
             type="text"
@@ -39,12 +71,14 @@ class Search extends Component {
           />
           <button
             data-testid="search-artist-button"
-            type="submit"
-            disabled={ this.isMoreThan() }
+            type="button"
+            disabled={ inputString.length <= 1 }
+            onClick={ this.handleClickButton }
           >
             Pesquisar
           </button>
-        </form>
+        </section>
+        {isLoading ? <Loading /> : albumCards}
       </div>
     );
   }
