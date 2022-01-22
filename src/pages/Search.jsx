@@ -24,6 +24,7 @@ class Search extends Component {
     });
   }
 
+  // https://www.geeksforgeeks.org/why-we-use-then-method-in-javascript/
   getAlbums = async () => {
     const { artistName } = this.state;
     await searchAlbumsAPI(artistName).then((element) => this.setState({
@@ -46,6 +47,8 @@ class Search extends Component {
   handleRenderAlbum = (allAlbums) => allAlbums.map((album) => (
     <AlbumRender key={ album.collectionId } album={ album } />
   ))
+
+  // Requisito realizado com a ajuda de Felipe Shinkae e Julio Rieger
 
   render() {
     const { inputString, isAlbumFound, isLoading, allAlbums, artistName } = this.state;
