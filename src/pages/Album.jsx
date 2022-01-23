@@ -31,6 +31,10 @@ class Album extends Component {
     });
   }
 
+  handleFavorite = () => {
+
+  }
+
   render() {
     const { musics, artistInfo, isLoading } = this.state;
     return (
@@ -46,12 +50,15 @@ class Album extends Component {
               </div>
               <div>
                 {musics.map((music) => (
-                  <MusicCard key={ music.trackId } music={ music } />
+                  <MusicCard
+                    key={ music.trackId }
+                    music={ music }
+                    musicObject={ music }
+                  />
                 ))}
               </div>
             </section>
           )}
-
       </div>
     );
   }
